@@ -7,6 +7,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 key = 'YOUR_COINBASE_API_KEY'
 scrt = 'YOUR_COINBASE_API_SECRET'
 google_creds = "YOUR_GOOGLE_CREDENTIALS_FILENAME.json"
+currency = 'GBP'
 
 # ALL FUNCTIONS
 def create_coinbase_client(key,scrt):
@@ -31,17 +32,18 @@ def pull_cb_account_info(client):
     # Iterate over each account that isn't a USD account
     for account in list_of_accounts:
         try:
-            if (account['currency'] == 'USD')\
+            if (account['currency'] == currency)\
             | (float(account['balance']['amount']) == 0):
                 pass
             else:
+                print(account['currency'] + ' ' + currency)
                 # Get current amount of currency and your totals
                 currency_name = account['balance']['currency']
                 current_quantity = float(account['balance']['amount'])
                 current_total = float(account['native_balance']['amount'])
                 current_price = float(client.get_spot_price(currency_pair
                                                       = currency_name +
-                                                      '-USD')['amount'])
+                                                      '-'+currency)['amount'])
 
                 currency_dict = {
                     'symbol': currency_name,
@@ -389,7 +391,7 @@ my_coinbase = pull_cb_account_info(client)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Connect to google spreadsheets and fill info
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-spreadsheet = connect_to_google_ss(google_creds_filename,"Coinbase Portfolio")
+spreadsheet = connect_to_google_ss(google_creds,"Coinbase Portfolio")
 # Filling out first sheet, portfolio overview
 generate_portfolio_overview(my_coinbase, spreadsheet)
 # Filling out second sheet, wallet details
